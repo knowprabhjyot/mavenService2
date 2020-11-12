@@ -4,8 +4,24 @@ const port = process.env.PORT || 3000;
 const bodyParser = require('body-parser')// importing body parser middleware to parse form content from HTML
 const nodemailer = require('nodemailer');//importing node mailer
 const cors = require('cors');
-const morgan = require('morgan')
-require('dotenv').config()
+const morgan = require('morgan');
+const mongoose = require('mongoose');
+const CollegeRoute = require('./routes/college');
+
+require('dotenv').config();
+
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+
+mongoose.connection.on('connected', () => {
+    console.log('Database connected...');
+})
+
+mongoose.connection.on('error', (error) => {
+    console.log('Error connecting...', error);
+})
 
 app.use(cors());
 app.use(morgan('combined'));
@@ -15,6 +31,8 @@ app.use(bodyParser.json())
 app.get('/', (req, res) => {
     res.send('API NOT FOUND')
 })
+
+app.use('/college', CollegeRoute);
 
 app.post('/contact',(req,res,next)=>{
     const transporter = nodemailer.createTransport({
